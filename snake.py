@@ -2,9 +2,9 @@
 try:
     import curses
 except ImportError:
-    print(
-        "Curses not installed, if you're on Windows, you can install it with: `pip install windows-curses`"
-    )
+    from os import name as osname
+    if osname == "nt":
+        print("Curses not installed. You can install it with: `pip install windows-curses`")
     exit(1)
 import time
 import random
