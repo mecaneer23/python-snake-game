@@ -8,9 +8,10 @@ except ImportError:
     exit(1)
 import time
 import random
+import os
 
-ROWS = 20
-COLS = 50
+ROWS = os.get_terminal_size().lines - 1
+COLS = os.get_terminal_size().columns - 1
 CHAR_SNAKE = "#"
 CHAR_FOOD = "*"
 CHAR_BG = "."
@@ -49,8 +50,8 @@ def main(stdscr):
         # next_direction = stdscr.getkey()
         next_direction = stdscr.getch()
         direction = direction if next_direction == -1 else next_direction
-        if snake[0][0] in [0, ROWS]: return "Snake out of bounds vertically"
-        if snake[0][1] in [0, COLS]: return "Snake out of bounds horizontally"
+        if snake[0][0] in [-1, ROWS]: return "Snake out of bounds vertically"
+        if snake[0][1] in [-1, COLS]: return "Snake out of bounds horizontally"
         if snake[0] in snake[1:]: return "Snake can't eat itself"
         new_head = snake[0].copy()
         if direction == 119: # w
