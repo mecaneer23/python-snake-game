@@ -52,7 +52,10 @@ def main(stdscr):
     # main loop
     while True:
         # next_direction = stdscr.getkey()
-        next_direction = stdscr.getch()
+        try:
+            next_direction = stdscr.getch()
+        except KeyboardInterrupt: # exit on ^C
+            return "Quit"
         direction = direction if next_direction == -1 else next_direction
         if snake[0][0] == ROWS: return f"Snake out of bounds vertically, score: {score}"
         if snake[0][1] == COLS: return f"Snake out of bounds horizontally, score: {score}"
