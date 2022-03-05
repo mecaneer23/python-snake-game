@@ -32,6 +32,7 @@ def main(stdscr):
     food = [ROWS//2, COLS//2]
     direction = 100
     paused = False
+    score = 0
 
     # draw board
     for x in range(ROWS):
@@ -45,22 +46,24 @@ def main(stdscr):
     # draw food
     stdscr.addch(*food, CHAR_FOOD)
 
+    stdscr.addstr(ROWS, 0, f"Controls: wasd or arrow keys, q to quit | Score: 0")
+
     # main loop
     while True:
         # next_direction = stdscr.getkey()
         next_direction = stdscr.getch()
         direction = direction if next_direction == -1 else next_direction
-        if snake[0][0] in [-1, ROWS]: return "Snake out of bounds vertically"
-        if snake[0][1] in [-1, COLS]: return "Snake out of bounds horizontally"
-        if snake[0] in snake[1:]: return "Snake can't eat itself"
+        if snake[0][0] == ROWS: return f"Snake out of bounds vertically, score: {score}"
+        if snake[0][1] == COLS: return f"Snake out of bounds horizontally, score: {score}"
+        if snake[0] in snake[1:]: return f"Snake can't eat itself, score: {score}"
         new_head = snake[0].copy()
-        if direction == 119: # w
+        if direction in (119, 259): # w | ^
             new_head[0] -= 1
-        elif direction == 97: # a
+        elif direction in (97, 260): # a | <
             new_head[1] -= 1
-        elif direction == 115: # s
+        elif direction in (115, 258): # s | v
             new_head[0] += 1
-        elif direction == 100: # d
+        elif direction in (100, 261): # d | >
             new_head[1] += 1
         elif direction == 113: # q
             return "Quit"
@@ -74,10 +77,12 @@ def main(stdscr):
                     new_food = [random.randint(0, ROWS-1), random.randint(0, COLS-1)]
                     food = new_food if new_food not in snake else None
                 stdscr.addch(*food, CHAR_FOOD)
+                score += 1
             else:
                 stdscr.addch(*snake.pop(-1), CHAR_BG)
             stdscr.addch(*snake[0], CHAR_SNAKE)
-            stdscr.refresh()
+        stdscr.addstr(ROWS, 49, str(score))
+        stdscr.refresh()
 
 
 if __name__ == "__main__":
