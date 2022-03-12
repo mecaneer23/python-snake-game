@@ -1,10 +1,14 @@
 #!/bin/env python3
+
 try:
     import curses
 except ImportError:
     from os import name as osname
+
     if osname == "nt":
-        print("Curses not installed. You can install it with: `pip install windows-curses`")
+        print(
+            "Curses not installed. You can install it with: `pip install windows-curses`"
+        )
     exit(1)
 import time
 import random
@@ -30,7 +34,7 @@ def main(stdscr):
 
     # Initialize game variables
     snake = [[5, 5], [5, 4], [5, 3]]
-    food = [ROWS//2, COLS//2]
+    food = [ROWS // 2, COLS // 2]
     direction = 100
     paused = False
     score = 0
@@ -54,22 +58,25 @@ def main(stdscr):
         # next_direction = stdscr.getkey()
         try:
             next_direction = stdscr.getch()
-        except KeyboardInterrupt: # exit on ^C
+        except KeyboardInterrupt:  # exit on ^C
             return "Quit"
         direction = direction if next_direction == -1 else next_direction
-        if snake[0][0] == ROWS: return f"Snake out of bounds vertically, score: {score}"
-        if snake[0][1] == COLS: return f"Snake out of bounds horizontally, score: {score}"
-        if snake[0] in snake[1:]: return f"Snake can't eat itself, score: {score}"
+        if snake[0][0] == ROWS:
+            return f"Snake out of bounds vertically, score: {score}"
+        if snake[0][1] == COLS:
+            return f"Snake out of bounds horizontally, score: {score}"
+        if snake[0] in snake[1:]:
+            return f"Snake can't eat itself, score: {score}"
         new_head = snake[0].copy()
-        if direction in (119, 259): # w | ^
+        if direction in (119, 259):  # w | ^
             new_head[0] -= 1
-        elif direction in (97, 260): # a | <
+        elif direction in (97, 260):  # a | <
             new_head[1] -= 1
-        elif direction in (115, 258): # s | v
+        elif direction in (115, 258):  # s | v
             new_head[0] += 1
-        elif direction in (100, 261): # d | >
+        elif direction in (100, 261):  # d | >
             new_head[1] += 1
-        elif direction in (113, 27): # q | esc
+        elif direction in (113, 27):  # q | esc
             return "Quit"
         else:
             continue
@@ -78,7 +85,10 @@ def main(stdscr):
             if snake[0] == food:
                 food = None
                 while food is None:
-                    new_food = [random.randint(0, ROWS-1), random.randint(0, COLS-1)]
+                    new_food = [
+                        random.randint(0, ROWS - 1),
+                        random.randint(0, COLS - 1),
+                    ]
                     food = new_food if new_food not in snake else None
                 stdscr.addch(*food, CHAR_FOOD)
                 score += 1
