@@ -19,10 +19,6 @@ COLS = os.get_terminal_size().columns - 1
 CHAR_SNAKE = "#"
 CHAR_FOOD = "*"
 CHAR_BG = "."
-UP = (0, -1)
-DOWN = (0, 1)
-LEFT = (-1, 0)
-RIGHT = (1, 0)
 
 
 def main(stdscr):
@@ -46,10 +42,10 @@ def main(stdscr):
 
     # draw snake
     for i, _ in enumerate(snake):
-        stdscr.addch(*snake[i], CHAR_SNAKE)
+        stdscr.addstr(*snake[i], CHAR_SNAKE)
 
     # draw food
-    stdscr.addch(*food, CHAR_FOOD)
+    stdscr.addstr(*food, CHAR_FOOD)
 
     stdscr.addstr(ROWS, 0, f"Controls: wasd or arrow keys, q to quit | Score: 0")
 
@@ -90,11 +86,11 @@ def main(stdscr):
                         random.randint(0, COLS - 1),
                     ]
                     food = new_food if new_food not in snake else None
-                stdscr.addch(*food, CHAR_FOOD)
+                stdscr.addstr(*food, CHAR_FOOD)
                 score += 1
             else:
-                stdscr.addch(*snake.pop(-1), CHAR_BG)
-            stdscr.addch(*snake[0], CHAR_SNAKE)
+                stdscr.addstr(*snake.pop(-1), CHAR_BG)
+            stdscr.addstr(*snake[0], CHAR_SNAKE)
         stdscr.addstr(ROWS, 49, str(score))
         stdscr.refresh()
 
