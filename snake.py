@@ -12,16 +12,16 @@ except ImportError:
     exit(1)
 import time
 import random
-import os
-
-ROWS = os.get_terminal_size().lines - 1
-COLS = os.get_terminal_size().columns - 1
-CHAR_SNAKE = "#"
-CHAR_FOOD = "*"
-CHAR_BG = "."
 
 
 def main(stdscr):
+    # Set global variables
+    ROWS = stdscr.getmaxyx()[0] - 1
+    COLS = stdscr.getmaxyx()[1] - 1
+    CHAR_SNAKE = "#"
+    CHAR_FOOD = "*"
+    CHAR_BG = "."
+
     # Initialize curses
     curses.curs_set(0)
     curses.use_default_colors()
