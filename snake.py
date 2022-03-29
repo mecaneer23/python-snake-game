@@ -11,6 +11,7 @@ except ImportError:
         )
     exit(1)
 import random
+import sys
 
 
 def main(stdscr):
@@ -30,10 +31,14 @@ def main(stdscr):
 
     # Initialize game variables
     snake = [[5, 5], [5, 4], [5, 3]]
+    score = 0
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        for i in range(int(sys.argv[1])):
+            snake.append([5, 3])
+        score = int(sys.argv[1])
     food = [ROWS // 2, COLS // 2]
     direction = 100
     paused = False
-    score = 0
 
     # draw board
     for x in range(ROWS):
