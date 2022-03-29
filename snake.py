@@ -22,7 +22,7 @@ def main(stdscr):
     stdscr.nodelay(True)
     stdscr.timeout(100)
 
-    # Set global variables
+    # Set constant variables
     ROWS = stdscr.getmaxyx()[0] - 1
     COLS = stdscr.getmaxyx()[1] - 1
     CHAR_SNAKE = "#"
