@@ -10,23 +10,23 @@ except ImportError:
             "Curses not installed. You can install it with: `pip install windows-curses`"
         )
     exit(1)
-import time
 import random
 
 
 def main(stdscr):
+    # Initialize curses
+    curses.curs_set(0)
+    curses.use_default_colors()
+    curses.noecho()
+    stdscr.nodelay(True)
+    stdscr.timeout(100)
+
     # Set global variables
     ROWS = stdscr.getmaxyx()[0] - 1
     COLS = stdscr.getmaxyx()[1] - 1
     CHAR_SNAKE = "#"
     CHAR_FOOD = "*"
     CHAR_BG = "."
-
-    # Initialize curses
-    curses.curs_set(0)
-    curses.use_default_colors()
-    stdscr.nodelay(True)
-    stdscr.timeout(100)
 
     # Initialize game variables
     snake = [[5, 5], [5, 4], [5, 3]]
@@ -73,7 +73,7 @@ def main(stdscr):
         elif direction in (100, 261):  # d | >
             new_head[1] += 1
         elif direction in (113, 27):  # q | esc
-            return "Quit"
+            return f"Quit, score: {score}"
         else:
             continue
         if not paused:
