@@ -62,12 +62,6 @@ def main(stdscr):
         except KeyboardInterrupt:  # exit on ^C
             return "Quit"
         direction = direction if next_direction == -1 else next_direction
-        if snake[0][0] == ROWS:
-            return f"Snake out of bounds vertically, score: {score}"
-        if snake[0][1] == COLS:
-            return f"Snake out of bounds horizontally, score: {score}"
-        if snake[0] in snake[1:]:
-            return f"Snake can't eat itself, score: {score}"
         new_head = snake[0].copy()
         if direction in (119, 259):  # w | ^
             new_head[0] -= 1
@@ -83,6 +77,12 @@ def main(stdscr):
             continue
         if not paused:
             snake.insert(0, new_head)
+            if snake[0][0] in (ROWS, -1):
+                return f"Snake out of bounds vertically, score: {score}"
+            if snake[0][1] in (COLS, -1):
+                return f"Snake out of bounds horizontally, score: {score}"
+            if snake[0] in snake[1:]:
+                return f"Snake can't eat itself, score: {score}"
             if snake[0] == food:
                 food = None
                 while food is None:
