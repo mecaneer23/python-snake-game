@@ -21,6 +21,15 @@ def main(stdscr):
     curses.noecho()
     stdscr.nodelay(True)
     stdscr.timeout(100)
+    if len(sys.argv) > 1 and "--color" in sys.argv:
+        curses.init_pair(1, curses.COLOR_WHITE, -1)
+        curses.init_pair(2, curses.COLOR_GREEN, -1)
+        curses.init_pair(3, curses.COLOR_RED, -1)
+    else:
+        curses.init_pair(1, -1, -1)
+        curses.init_pair(2, -1, -1)
+        curses.init_pair(3, -1, -1)
+
 
     # Set constant variables
     ROWS = stdscr.getmaxyx()[0] - 1
@@ -43,14 +52,14 @@ def main(stdscr):
     # draw board
     for x in range(ROWS):
         for y in range(COLS):
-            stdscr.addstr(x, y, CHAR_BG)
+            stdscr.addstr(x, y, CHAR_BG, curses.color_pair(1))
 
     # draw snake
     for i, _ in enumerate(snake):
-        stdscr.addstr(*snake[i], CHAR_SNAKE)
+        stdscr.addstr(*snake[i], CHAR_SNAKE, curses.color_pair(2))
 
     # draw food
-    stdscr.addstr(*food, CHAR_FOOD)
+    stdscr.addstr(*food, CHAR_FOOD, curses.color_pair(3))
 
     stdscr.addstr(ROWS, 0, f"Controls: wasd or arrow keys, q to quit | Score: 0")
 
@@ -91,11 +100,11 @@ def main(stdscr):
                         random.randint(0, COLS - 1),
                     ]
                     food = new_food if new_food not in snake else None
-                stdscr.addstr(*food, CHAR_FOOD)
+                stdscr.addstr(*food, CHAR_FOOD, curses.color_pair(3))
                 score += 1
             else:
-                stdscr.addstr(*snake.pop(-1), CHAR_BG)
-            stdscr.addstr(*snake[0], CHAR_SNAKE)
+                stdscr.addstr(*snake.pop(-1), CHAR_BG, curses.color_pair(1))
+            stdscr.addstr(*snake[0], CHAR_SNAKE, curses.color_pair(2))
         stdscr.addstr(ROWS, 49, str(score))
         stdscr.refresh()
 
