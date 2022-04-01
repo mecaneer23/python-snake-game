@@ -37,6 +37,7 @@ def main(stdscr):
     CHAR_SNAKE = "#"
     CHAR_FOOD = "*"
     CHAR_BG = "."
+    IS_LARGE_ENOUGH = COLS > 50
 
     # Initialize game variables
     snake = [[5, 5], [5, 4], [5, 3]]
@@ -61,7 +62,7 @@ def main(stdscr):
     # draw food
     stdscr.addstr(*food, CHAR_FOOD, curses.color_pair(3))
 
-    stdscr.addstr(ROWS, 0, f"Controls: wasd or arrow keys, q to quit | Score: 0", curses.color_pair(1))
+    stdscr.addstr(ROWS, 0, "Controls: wasd or arrow keys, q to quit | Score: 0" if IS_LARGE_ENOUGH else "Score: 0", curses.color_pair(1))
 
     # main loop
     while True:
@@ -105,7 +106,7 @@ def main(stdscr):
             else:
                 stdscr.addstr(*snake.pop(-1), CHAR_BG, curses.color_pair(1))
             stdscr.addstr(*snake[0], CHAR_SNAKE, curses.color_pair(2))
-        stdscr.addstr(ROWS, 49, str(score), curses.color_pair(1))
+        stdscr.addstr(ROWS, 49 if IS_LARGE_ENOUGH else 7, str(score), curses.color_pair(1))
         stdscr.refresh()
 
 
