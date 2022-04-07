@@ -1,6 +1,6 @@
 # Python Snake Game
 
-This is a snake game in python. You can edit the character constants in the code to change the look of the game.
+This is a snake game in python. The default characters are as below.
 
 - Snake: `#`
 - Food: `*`
@@ -13,9 +13,9 @@ WASD or arrow keys for snake movement. Q to quit. Any other key to pause. Press 
 ## Running the game
 
 ```bash
-python3 snake.py
+python3 snake.py [flags]
 ```
 
 ### Flags
 
-You can optionally run with the `--color` flag to enable colored output. The snake is green by default and the food is red.
+See `snake.py --help`
