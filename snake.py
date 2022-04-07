@@ -12,7 +12,6 @@ except ImportError:
         )
     exit(1)
 import random
-import sys
 import argparse
 
 
