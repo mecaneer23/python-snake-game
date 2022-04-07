@@ -23,3 +23,4 @@ See `snake.py --help`
 ## Todo
 
 - [ ] Make horizontal and vertical speeds equal
+- [ ] Fix pausing (save state and unpause at same state)
