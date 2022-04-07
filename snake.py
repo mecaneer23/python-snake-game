@@ -27,14 +27,25 @@ def main():
         return exit_msg
 
     parser = argparse.ArgumentParser(description="snake game", add_help=False)
-    parser.add_argument("--help", "-h", action="help", help="show this help message and exit")
+    parser.add_argument(
+        "--help", "-h", action="help", help="show this help message and exit"
+    )
     parser.add_argument("--cheat", type=int, help=argparse.SUPPRESS)
-    parser.add_argument("--black-white", "--bw", action="store_true", help="disable colors (black and white only)")
+    parser.add_argument(
+        "--black-white",
+        "--bw",
+        action="store_true",
+        help="disable colors (black and white only)",
+    )
     parser.add_argument("--rows", "-r", type=int, help="set rows")
     parser.add_argument("--columns", "-c", type=int, help="set columns")
-    parser.add_argument("--char-snake", type=str, default="#", help="set snake character")
+    parser.add_argument(
+        "--char-snake", type=str, default="#", help="set snake character"
+    )
     parser.add_argument("--char-food", type=str, default="*", help="set food character")
-    parser.add_argument("--char-bg", type=str, default=".", help="set background character")
+    parser.add_argument(
+        "--char-bg", type=str, default=".", help="set background character"
+    )
     parser.add_argument("--speed", "-s", type=int, default=10, help="set speed")
     args = parser.parse_args()
 
@@ -45,7 +56,7 @@ def main():
     curses.use_default_colors()
     curses.noecho()
     stdscr.nodelay(True)
-    stdscr.timeout(1000//args.speed)
+    stdscr.timeout(1000 // args.speed)
     stdscr.keypad(1)
 
     curses.init_pair(1, -1 if args.black_white else curses.COLOR_WHITE, -1)
