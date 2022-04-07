@@ -42,16 +42,19 @@ def main():
     parser.add_argument(
         "--color-snake",
         choices=["black", "white", "red", "green", "yellow", "blue", "magenta", "cyan"],
+        default="green",
         help="set snake color",
     )
     parser.add_argument(
         "--color-food",
         choices=["black", "white", "red", "green", "yellow", "blue", "magenta", "cyan"],
+        default="yellow",
         help="set food color",
     )
     parser.add_argument(
         "--color-bg",
         choices=["black", "white", "red", "green", "yellow", "blue", "magenta", "cyan"],
+        default="white",
         help="set background color",
     )
     parser.add_argument(
@@ -85,15 +88,9 @@ def main():
         "cyan": curses.COLOR_CYAN,
     }
 
-    curses.init_pair(1, colors[args.color_bg] if args.color_bg else colors["white"], -1)
-    curses.init_pair(
-        2, colors[args.color_snake] if args.color_snake else colors["green"], -1
-    )
-    curses.init_pair(
-        3, colors[args.color_food] if args.color_food else colors["yellow"], -1
-    )
-    if args.black_white:
-        [curses.init_pair(i + 1, -1, -1) for i in range(3)]
+    curses.init_pair(1, -1 if args.black_white else colors[args.color_bg], -1)
+    curses.init_pair(2, -1 if args.black_white else colors[args.color_snake], -1)
+    curses.init_pair(3, -1 if args.black_white else colors[args.color_food], -1)
 
     ROWS = args.rows or stdscr.getmaxyx()[0] - 1
     COLS = args.columns or stdscr.getmaxyx()[1] - 1
