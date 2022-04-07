@@ -19,3 +19,7 @@ python3 snake.py [flags]
 ### Flags
 
 See `snake.py --help`
+
+## Todo
+
+- [ ] Make horizontal and vertical speeds equal
