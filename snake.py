@@ -40,6 +40,21 @@ def main():
     parser.add_argument("--rows", "-r", type=int, help="set rows")
     parser.add_argument("--columns", "-c", type=int, help="set columns")
     parser.add_argument(
+        "--color-snake",
+        choices=["black", "white", "red", "green", "yellow", "blue", "magenta", "cyan"],
+        help="set snake color",
+    )
+    parser.add_argument(
+        "--color-food",
+        choices=["black", "white", "red", "green", "yellow", "blue", "magenta", "cyan"],
+        help="set food color",
+    )
+    parser.add_argument(
+        "--color-bg",
+        choices=["black", "white", "red", "green", "yellow", "blue", "magenta", "cyan"],
+        help="set background color",
+    )
+    parser.add_argument(
         "--char-snake", type=str, default="#", help="set snake character"
     )
     parser.add_argument("--char-food", type=str, default="*", help="set food character")
@@ -59,9 +74,26 @@ def main():
     stdscr.timeout(1000 // args.speed)
     stdscr.keypad(1)
 
-    curses.init_pair(1, -1 if args.black_white else curses.COLOR_WHITE, -1)
-    curses.init_pair(2, -1 if args.black_white else curses.COLOR_GREEN, -1)
-    curses.init_pair(3, -1 if args.black_white else curses.COLOR_YELLOW, -1)
+    colors = {
+        "black": curses.COLOR_BLACK,
+        "white": curses.COLOR_WHITE,
+        "red": curses.COLOR_RED,
+        "green": curses.COLOR_GREEN,
+        "yellow": curses.COLOR_YELLOW,
+        "blue": curses.COLOR_BLUE,
+        "magenta": curses.COLOR_MAGENTA,
+        "cyan": curses.COLOR_CYAN,
+    }
+
+    curses.init_pair(1, colors[args.color_bg] if args.color_bg else colors["white"], -1)
+    curses.init_pair(
+        2, colors[args.color_snake] if args.color_snake else colors["green"], -1
+    )
+    curses.init_pair(
+        3, colors[args.color_food] if args.color_food else colors["yellow"], -1
+    )
+    if args.black_white:
+        [curses.init_pair(i + 1, -1, -1) for i in range(3)]
 
     ROWS = args.rows or stdscr.getmaxyx()[0] - 1
     COLS = args.columns or stdscr.getmaxyx()[1] - 1
