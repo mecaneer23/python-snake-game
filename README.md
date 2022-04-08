@@ -20,6 +20,13 @@ python3 snake.py [flags]
 
 See `snake.py --help`
 
+### Example configurations
+
+```bash
+python3 snake.py --char-head='☺' --char-snake='+' --char-bg=' '
+python3 snake.py --color-snake blue --color-food red
+```
+
 ## Todo
 
 - [ ] Make horizontal and vertical speeds equal

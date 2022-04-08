@@ -60,6 +60,9 @@ def main():
     parser.add_argument(
         "--char-snake", type=str, default="#", help="set snake character"
     )
+    parser.add_argument(
+        "--char-head", type=str, default="#", help="set head character"
+    )
     parser.add_argument("--char-food", type=str, default="*", help="set food character")
     parser.add_argument(
         "--char-bg", type=str, default=".", help="set background character"
@@ -95,6 +98,7 @@ def main():
     ROWS = args.rows or stdscr.getmaxyx()[0] - 1
     COLS = args.columns or stdscr.getmaxyx()[1] - 1
     CHAR_SNAKE = args.char_snake
+    CHAR_HEAD = args.char_head
     CHAR_FOOD = args.char_food
     CHAR_BG = args.char_bg
     IS_LARGE_ENOUGH = COLS > 50
@@ -108,13 +112,14 @@ def main():
     food = [ROWS // 2, COLS // 2]
     direction = 100
     paused = False
+    body = [*snake[0]]
 
     for x in range(ROWS):
         for y in range(COLS):
             stdscr.addstr(x, y, CHAR_BG, curses.color_pair(1))
 
     for i, _ in enumerate(snake):
-        stdscr.addstr(*snake[i], CHAR_SNAKE, curses.color_pair(2))
+        stdscr.addstr(*snake[i], CHAR_HEAD, curses.color_pair(2))
 
     stdscr.addstr(*food, CHAR_FOOD, curses.color_pair(3))
 
@@ -166,7 +171,9 @@ def main():
                 score += 1
             else:
                 stdscr.addstr(*snake.pop(-1), CHAR_BG, curses.color_pair(1))
-            stdscr.addstr(*snake[0], CHAR_SNAKE, curses.color_pair(2))
+            stdscr.addstr(*body, CHAR_SNAKE, curses.color_pair(2))
+            body = [*snake[0]]
+            stdscr.addstr(*snake[0], CHAR_HEAD, curses.color_pair(2))
         stdscr.addstr(
             ROWS, 49 if IS_LARGE_ENOUGH else 7, str(score), curses.color_pair(1)
         )
