@@ -29,5 +29,5 @@ python3 snake.py --color-snake blue --color-food red
 
 ## Todo
 
-- [ ] Make horizontal and vertical speeds equal
+- [X] Make horizontal and vertical speeds equal
 - [ ] Fix pausing (save state and unpause at same state)

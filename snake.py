@@ -102,6 +102,7 @@ def main():
     CHAR_FOOD = args.char_food
     CHAR_BG = args.char_bg
     IS_LARGE_ENOUGH = COLS > 50
+    CHARACTER_ASPECT_RATIO = 19 / 9
 
     snake = [[5, 5], [5, 4], [5, 3]]
     score = len(snake)
@@ -141,12 +142,16 @@ def main():
         new_head = snake[0].copy()
         if direction in (119, 259):  # w | ^
             new_head[0] -= 1
+            stdscr.timeout(int(1000 / (args.speed / CHARACTER_ASPECT_RATIO)))
         elif direction in (97, 260):  # a | <
             new_head[1] -= 1
+            stdscr.timeout(1000 // args.speed)
         elif direction in (115, 258):  # s | v
             new_head[0] += 1
+            stdscr.timeout(int(1000 / (args.speed / CHARACTER_ASPECT_RATIO)))
         elif direction in (100, 261):  # d | >
             new_head[1] += 1
+            stdscr.timeout(1000 // args.speed)
         elif direction in (113, 27):  # q | esc
             return end(f"Quit, score: {score}")
         else:
