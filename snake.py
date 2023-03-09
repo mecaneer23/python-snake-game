@@ -15,17 +15,21 @@ import random
 import argparse
 
 
-def main():
-    def end(exit_msg):
-        try:
-            curses.nocbreak()
-            stdscr.keypad(False)
-            curses.echo()
-            curses.endwin()
-        except curses.error:
-            return "Error in exiting"
-        return exit_msg
+class Snake_Board_Descriptor:
+    def __init__(
+        self, rows, cols, char_snake, char_head, char_food, char_bg, max_speed
+    ):
+        self.rows = rows
+        self.cols = cols
+        self.char_snake = char_snake
+        self.char_head = char_head
+        self.char_food = char_food
+        self.char_bg = char_bg
+        self.is_large_enough = self.cols > 50
+        self.max_speed = max_speed
 
+
+def get_args():
     parser = argparse.ArgumentParser(description="snake game", add_help=False)
     parser.add_argument(
         "--help", "-h", action="help", help="show this help message and exit"
@@ -60,16 +64,27 @@ def main():
     parser.add_argument(
         "--char-snake", type=str, default="#", help="set snake character"
     )
-    parser.add_argument(
-        "--char-head", type=str, default="#", help="set head character"
-    )
+    parser.add_argument("--char-head", type=str, default="#", help="set head character")
     parser.add_argument("--char-food", type=str, default="*", help="set food character")
     parser.add_argument(
         "--char-bg", type=str, default=".", help="set background character"
     )
     parser.add_argument("--speed", "-s", type=int, default=10, help="set speed")
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def end(stdscr, exit_msg):
+    try:
+        curses.nocbreak()
+        stdscr.keypad(False)
+        curses.echo()
+        curses.endwin()
+    except curses.error:
+        return "Error in exiting"
+    return exit_msg
+
+
+def init(args: argparse.Namespace):
     stdscr = curses.initscr()
     curses.start_color()
     curses.cbreak()
@@ -95,95 +110,105 @@ def main():
     curses.init_pair(2, -1 if args.black_white else colors[args.color_snake], -1)
     curses.init_pair(3, -1 if args.black_white else colors[args.color_food], -1)
 
-    ROWS = args.rows or stdscr.getmaxyx()[0] - 1
-    COLS = args.columns or stdscr.getmaxyx()[1] - 1
-    CHAR_SNAKE = args.char_snake
-    CHAR_HEAD = args.char_head
-    CHAR_FOOD = args.char_food
-    CHAR_BG = args.char_bg
-    IS_LARGE_ENOUGH = COLS > 50
-    CHARACTER_ASPECT_RATIO = 19 / 9
+    params = Snake_Board_Descriptor(
+        args.rows or stdscr.getmaxyx()[0] - 1,
+        args.columns or stdscr.getmaxyx()[1] - 1,
+        args.char_snake,
+        args.char_head,
+        args.char_food,
+        args.char_bg,
+        args.speed,
+    )
 
     snake = [[5, 5], [5, 4], [5, 3]]
-    score = len(snake)
     if args.cheat:
         for i in range(args.cheat):
             snake.append([5, 3])
         score += args.cheat
-    food = [ROWS // 2, COLS // 2]
-    direction = 100
-    paused = False
-    body = [*snake[0]]
 
-    for x in range(ROWS):
-        for y in range(COLS):
-            stdscr.addstr(x, y, CHAR_BG, curses.color_pair(1))
+    for x in range(params.rows):
+        for y in range(params.cols):
+            stdscr.addstr(x, y, params.char_bg, curses.color_pair(1))
 
     for i, _ in enumerate(snake):
-        stdscr.addstr(*snake[i], CHAR_HEAD, curses.color_pair(2))
-
-    stdscr.addstr(*food, CHAR_FOOD, curses.color_pair(3))
+        stdscr.addstr(*snake[i], params.char_head, curses.color_pair(2))
 
     stdscr.addstr(
-        ROWS,
+        params.rows // 2, params.cols // 2, params.char_food, curses.color_pair(3)
+    )
+
+    stdscr.addstr(
+        params.rows,
         0,
         "Controls: wasd or arrow keys, q to quit | Score: 0"
-        if IS_LARGE_ENOUGH
+        if params.is_large_enough
         else "Score: 0",
         curses.color_pair(1),
     )
+    return stdscr, snake, params
 
+
+def main(stdscr, snake, params):
+    CHARACTER_ASPECT_RATIO = 19 / 9
+    paused = False
+    direction = 100
+    body = [*snake[0]]
+    score = len(snake)
+    food = [params.rows // 2, params.cols // 2]
     while True:
         try:
             next_direction = stdscr.getch()
         except KeyboardInterrupt:  # exit on ^C
-            return end("Quit")
+            return end(stdscr, "Quit")
         direction = direction if next_direction == -1 else next_direction
         new_head = snake[0].copy()
         if direction in (119, 259):  # w | ^
             new_head[0] -= 1
-            stdscr.timeout(int(1000 / (args.speed / CHARACTER_ASPECT_RATIO)))
+            stdscr.timeout(int(1000 / (params.max_speed / CHARACTER_ASPECT_RATIO)))
         elif direction in (97, 260):  # a | <
             new_head[1] -= 1
-            stdscr.timeout(1000 // args.speed)
+            stdscr.timeout(1000 // params.max_speed)
         elif direction in (115, 258):  # s | v
             new_head[0] += 1
-            stdscr.timeout(int(1000 / (args.speed / CHARACTER_ASPECT_RATIO)))
+            stdscr.timeout(int(1000 / (params.max_speed / CHARACTER_ASPECT_RATIO)))
         elif direction in (100, 261):  # d | >
             new_head[1] += 1
-            stdscr.timeout(1000 // args.speed)
+            stdscr.timeout(1000 // params.max_speed)
         elif direction in (113, 27):  # q | esc
-            return end(f"Quit, score: {score}")
+            return end(stdscr, f"Quit, score: {score}")
         else:
             continue
         if not paused:
             snake.insert(0, new_head)
-            if snake[0][0] in (ROWS, -1):
-                return end(f"Snake out of bounds vertically, score: {score}")
-            if snake[0][1] in (COLS, -1):
-                return end(f"Snake out of bounds horizontally, score: {score}")
+            if snake[0][0] in (params.rows, -1):
+                return end(stdscr, f"Snake out of bounds vertically, score: {score}")
+            if snake[0][1] in (params.cols, -1):
+                return end(stdscr, f"Snake out of bounds horizontally, score: {score}")
             if snake[0] in snake[1:]:
-                return end(f"Snake can't eat itself, score: {score}")
+                return end(stdscr, f"Snake can't eat itself, score: {score}")
             if snake[0] == food:
                 food = None
                 while food is None:
                     new_food = [
-                        random.randint(0, ROWS - 1),
-                        random.randint(0, COLS - 1),
+                        random.randint(0, params.rows - 1),
+                        random.randint(0, params.cols - 1),
                     ]
                     food = new_food if new_food not in snake else None
-                stdscr.addstr(*food, CHAR_FOOD, curses.color_pair(3))
+                stdscr.addstr(*food, params.char_food, curses.color_pair(3))
                 score += 1
             else:
-                stdscr.addstr(*snake.pop(-1), CHAR_BG, curses.color_pair(1))
-            stdscr.addstr(*body, CHAR_SNAKE, curses.color_pair(2))
+                stdscr.addstr(*snake.pop(-1), params.char_bg, curses.color_pair(1))
+            stdscr.addstr(*body, params.char_snake, curses.color_pair(2))
             body = [*snake[0]]
-            stdscr.addstr(*snake[0], CHAR_HEAD, curses.color_pair(2))
+            stdscr.addstr(*snake[0], params.char_head, curses.color_pair(2))
         stdscr.addstr(
-            ROWS, 49 if IS_LARGE_ENOUGH else 7, str(score), curses.color_pair(1)
+            params.rows,
+            49 if params.is_large_enough else 7,
+            str(score),
+            curses.color_pair(1),
         )
         stdscr.refresh()
 
 
 if __name__ == "__main__":
-    print(f"Game over: {main()}")
+    print(f"Game over: {main(*init(get_args()))}")
