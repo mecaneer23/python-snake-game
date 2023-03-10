@@ -84,7 +84,7 @@ def end(stdscr, exit_msg):
     return exit_msg
 
 
-def init(args: argparse.Namespace):
+def main(args: argparse.Namespace):
     stdscr = curses.initscr()
     curses.start_color()
     curses.cbreak()
@@ -121,10 +121,15 @@ def init(args: argparse.Namespace):
     )
 
     snake = [[5, 5], [5, 4], [5, 3]]
+    CHARACTER_ASPECT_RATIO = 19 / 9
+    paused = False
+    direction = 100
+    body = [*snake[0]]
+    food = [params.rows // 2, params.cols // 2]
     if args.cheat:
         for i in range(args.cheat):
             snake.append([5, 3])
-        score += args.cheat
+    score = len(snake)
 
     for x in range(params.rows):
         for y in range(params.cols):
@@ -145,16 +150,7 @@ def init(args: argparse.Namespace):
         else "Score: 0",
         curses.color_pair(1),
     )
-    return stdscr, snake, params
 
-
-def main(stdscr, snake, params):
-    CHARACTER_ASPECT_RATIO = 19 / 9
-    paused = False
-    direction = 100
-    body = [*snake[0]]
-    score = len(snake)
-    food = [params.rows // 2, params.cols // 2]
     while True:
         try:
             next_direction = stdscr.getch()
@@ -211,4 +207,4 @@ def main(stdscr, snake, params):
 
 
 if __name__ == "__main__":
-    print(f"Game over: {main(*init(get_args()))}")
+    print(f"Game over: {main(get_args())}")
