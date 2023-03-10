@@ -13,6 +13,8 @@ except ImportError:
     exit(1)
 import random
 import argparse
+import json
+import os
 
 
 class Snake_Board_Descriptor:
@@ -83,6 +85,14 @@ def end(stdscr, exit_msg):
         return "Error in exiting"
     return exit_msg
 
+def update_best_score(score, data):  
+    best_score = data["best-score"]
+    if score > best_score:
+        best_score = score
+        data["best-score"] = best_score
+        with open("data.json", "w") as f:
+            json.dump(data, f)
+    return best_score
 
 def main(args: argparse.Namespace):
     stdscr = curses.initscr()
@@ -126,6 +136,11 @@ def main(args: argparse.Namespace):
     direction = 100
     body = [*snake[0]]
     food = [params.rows // 2, params.cols // 2]
+    if not os.path.exists('data.json'):
+        with open('data.json', "w") as f:
+            new_data = {"best-score": 0}
+            json.dump(new_data, f)
+    data = json.load(open("data.json", "r"))
     if args.cheat:
         for i in range(args.cheat):
             snake.append([5, 3])
@@ -171,17 +186,21 @@ def main(args: argparse.Namespace):
             new_head[1] += 1
             stdscr.timeout(1000 // params.max_speed)
         elif direction in (113, 27):  # q | esc
-            return end(stdscr, f"Quit, score: {score}")
+            best_score = update_best_score(score, data)
+            return end(stdscr, f"Quit, score: {score}, best score: {best_score}")
         else:
             continue
         if not paused:
             snake.insert(0, new_head)
             if snake[0][0] in (params.rows, -1):
-                return end(stdscr, f"Snake out of bounds vertically, score: {score}")
+                best_score = update_best_score(score, data)
+                return end(stdscr, f"Snake out of bounds vertically, score: {score}, best score: {best_score}")
             if snake[0][1] in (params.cols, -1):
-                return end(stdscr, f"Snake out of bounds horizontally, score: {score}")
+                best_score = update_best_score(score, data)
+                return end(stdscr, f"Snake out of bounds horizontally, score: {score}, best score: {best_score}")
             if snake[0] in snake[1:]:
-                return end(stdscr, f"Snake can't eat itself, score: {score}")
+                best_score = update_best_score(score, data)
+                return end(stdscr, f"Snake can't eat itself, score: {score}, best score: {best_score}")
             if snake[0] == food:
                 food = None
                 while food is None:
