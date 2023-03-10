@@ -13,6 +13,10 @@ except ImportError:
     exit(1)
 import random
 import argparse
+import os
+
+CHARACTER_ASPECT_RATIO = 19 / 9
+FILENAME = "best-score.txt"
 
 
 class Snake_Board_Descriptor:
@@ -73,7 +77,7 @@ def get_args():
     return parser.parse_args()
 
 
-def end(stdscr, exit_msg):
+def end(stdscr, exit_msg, **kwargs):
     try:
         curses.nocbreak()
         stdscr.keypad(False)
@@ -81,7 +85,30 @@ def end(stdscr, exit_msg):
         curses.endwin()
     except curses.error:
         return "Error in exiting"
-    return exit_msg
+    return (
+        exit_msg
+        + "\n"
+        + ", ".join(
+            f"{k.capitalize().replace('_', ' ')}: {v}" for k, v in kwargs.items()
+        )
+    )
+
+
+def update_best_score(score, best_score=None):
+    best_score = best_score if best_score else fetch_best_score(score)
+    if score > best_score:
+        with open(FILENAME, "w") as f:
+            f.write(str(score))
+    return max(score, best_score)
+
+
+def fetch_best_score(score=0):
+    if not os.path.exists(FILENAME):
+        with open(FILENAME, "w") as f:
+            f.write(str(score))
+        return score
+    with open(FILENAME, "r") as f:
+        return int(f.read().split("\n")[0])
 
 
 def main(args: argparse.Namespace):
@@ -121,7 +148,6 @@ def main(args: argparse.Namespace):
     )
 
     snake = [[5, 5], [5, 4], [5, 3]]
-    CHARACTER_ASPECT_RATIO = 19 / 9
     paused = False
     direction = 100
     body = [*snake[0]]
@@ -130,6 +156,7 @@ def main(args: argparse.Namespace):
         for i in range(args.cheat):
             snake.append([5, 3])
     score = len(snake)
+    best_score = update_best_score(score)
 
     for x in range(params.rows):
         for y in range(params.cols):
@@ -155,7 +182,7 @@ def main(args: argparse.Namespace):
         try:
             next_direction = stdscr.getch()
         except KeyboardInterrupt:  # exit on ^C
-            return end(stdscr, "Quit")
+            return end(stdscr, "Quit", score=score, best_score=best_score)
         direction = direction if next_direction == -1 else next_direction
         new_head = snake[0].copy()
         if direction in (119, 259):  # w | ^
@@ -171,17 +198,29 @@ def main(args: argparse.Namespace):
             new_head[1] += 1
             stdscr.timeout(1000 // params.max_speed)
         elif direction in (113, 27):  # q | esc
-            return end(stdscr, f"Quit, score: {score}")
+            return end(stdscr, "Quit", score=score, best_score=best_score)
         else:
             continue
         if not paused:
             snake.insert(0, new_head)
             if snake[0][0] in (params.rows, -1):
-                return end(stdscr, f"Snake out of bounds vertically, score: {score}")
+                return end(
+                    stdscr,
+                    "Snake out of bounds vertically",
+                    score=score,
+                    best_score=best_score,
+                )
             if snake[0][1] in (params.cols, -1):
-                return end(stdscr, f"Snake out of bounds horizontally, score: {score}")
+                return end(
+                    stdscr,
+                    "Snake out of bounds horizontally",
+                    score=score,
+                    best_score=best_score,
+                )
             if snake[0] in snake[1:]:
-                return end(stdscr, f"Snake can't eat itself, score: {score}")
+                return end(
+                    stdscr, "Snake can't eat itself", score=score, best_score=best_score
+                )
             if snake[0] == food:
                 food = None
                 while food is None:
@@ -192,6 +231,7 @@ def main(args: argparse.Namespace):
                     food = new_food if new_food not in snake else None
                 stdscr.addstr(*food, params.char_food, curses.color_pair(3))
                 score += 1
+                best_score = update_best_score(score)
             else:
                 stdscr.addstr(*snake.pop(-1), params.char_bg, curses.color_pair(1))
             stdscr.addstr(*body, params.char_snake, curses.color_pair(2))
