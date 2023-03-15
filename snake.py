@@ -14,9 +14,8 @@ except ImportError:
 import random
 import argparse
 import os
-
 CHARACTER_ASPECT_RATIO = 19 / 9
-FILENAME = "best-score.txt"
+FILENAME = os.path.expanduser("~/.config/snake-best-score.txt")
 
 
 class Snake_Board_Descriptor:
