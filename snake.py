@@ -1,24 +1,15 @@
 #!/usr/bin/env python3
 
-try:
-    import curses
-except ImportError:
-    from os import name as osname
-
-    if osname == "nt":
-        print(
-            "Curses not installed."
-            "You can install it with: `pip install windows-curses`"
-        )
-    exit(1)
+import curses
 import random
 import argparse
 import os
+
 CHARACTER_ASPECT_RATIO = 19 / 9
 FILENAME = os.path.expanduser("~/.config/snake-best-score.txt")
 
 
-class Snake_Board_Descriptor:
+class SnakeBoardDescriptor:
     def __init__(
         self, rows, cols, char_snake, char_head, char_food, char_bg, max_speed
     ):
@@ -92,6 +83,7 @@ def end(stdscr, exit_msg, **kwargs):
         )
     )
 
+# ... (continued in the next response)
 
 def update_best_score(score, best_score=None):
     best_score = best_score if best_score else fetch_best_score(score)
@@ -136,7 +128,7 @@ def main(args: argparse.Namespace):
     curses.init_pair(2, -1 if args.black_white else colors[args.color_snake], -1)
     curses.init_pair(3, -1 if args.black_white else colors[args.color_food], -1)
 
-    params = Snake_Board_Descriptor(
+    params = SnakeBoardDescriptor(
         args.rows or stdscr.getmaxyx()[0] - 1,
         args.columns or stdscr.getmaxyx()[1] - 1,
         args.char_snake,
