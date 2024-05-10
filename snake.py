@@ -103,7 +103,7 @@ class Snake(DisplayableInterface):
             self._body.append(Location(5, 3))
 
     def display(self, stdscr: curses.window) -> None:
-        stdscr.addstr(
+        stdscr.addch(
             self._head.get_y(),
             self._head.get_x(),
             self._head_char,
@@ -155,10 +155,6 @@ class Food(DisplayableInterface):
         self._cols = cols
         self._location = Location(rows // 2, cols // 2)
 
-    def get_char(self) -> str:
-        """Return the character used to represent food"""
-        return self._char
-
     def get_location(self) -> Location:
         """Return the food's current location"""
         return self._location
@@ -176,7 +172,7 @@ class Food(DisplayableInterface):
             break
 
     def display(self, stdscr: curses.window) -> None:
-        stdscr.addstr(
+        stdscr.addch(
             self._location.get_y(),
             self._location.get_x(),
             self._char,
@@ -190,7 +186,7 @@ class Game:
     def _init_board(self) -> None:
         for y in range(self._board.get_rows()):
             for x in range(self._board.get_cols()):
-                self._stdscr.addstr(
+                self._stdscr.addch(
                     y, x, self._board.get_background_char(), curses.color_pair(1)
                 )
 
@@ -226,14 +222,6 @@ class Game:
         self._init_board()
         for obj in (self._food, self._snake):
             obj.display(self._stdscr)
-
-    def get_board(self) -> Board:
-        """Return the board object"""
-        return self._board
-
-    def get_snake(self) -> Snake:
-        """Return the snake object"""
-        return self._snake
 
     def get_input(self) -> Direction:
         """
@@ -309,7 +297,7 @@ class Game:
                 # best_score = update_best_score(score)
             else:
                 new_bg = self._snake.pop()
-                self._stdscr.addstr(
+                self._stdscr.addch(
                     new_bg.get_y(),
                     new_bg.get_x(),
                     self._board.get_background_char(),
