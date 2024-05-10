@@ -48,12 +48,12 @@ class Board:
         """Get the background character"""
         return self._background_char
 
-    def is_large_enough(self) -> bool:
+    def is_large_enough(self, long_text_length: int) -> bool:
         """
         Return whether the board is wide
         enough to display the instructions
         """
-        return self._cols > 50
+        return self._cols > long_text_length
 
 
 class Location:
@@ -183,6 +183,9 @@ class Food(DisplayableInterface):
 class Game:
     """Runnable game object"""
 
+    _LONG_TEXT = "Controls: wasd or arrow keys, q to quit | Score: 0"
+    _SHORT_TEXT = "Score: 0"
+
     def _init_board(self) -> None:
         for y in range(self._board.get_rows()):
             for x in range(self._board.get_cols()):
@@ -193,9 +196,9 @@ class Game:
         self._stdscr.addstr(
             self._board.get_rows(),
             0,
-            "Controls: wasd or arrow keys, q to quit | Score: 0"
-            if self._board.is_large_enough()
-            else "Score: 0",
+            self._LONG_TEXT
+            if self._board.is_large_enough(len(self._LONG_TEXT))
+            else self._SHORT_TEXT,
             curses.color_pair(1),
         )
 
@@ -272,7 +275,12 @@ class Game:
         """Output the current score at the correct location"""
         self._stdscr.addstr(
             self._board.get_rows(),
-            49 if self._board.is_large_enough() else 7,
+            (
+                len(self._LONG_TEXT)
+                if self._board.is_large_enough(len(self._LONG_TEXT))
+                else len(self._SHORT_TEXT)
+            )
+            - 1,
             str(self._score),
             curses.color_pair(1),
         )
