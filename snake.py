@@ -462,15 +462,10 @@ def get_args() -> Namespace:
 def main(stdscr: curses.window) -> str:
     """Entry point for snake game"""
     args = get_args()
-    # stdscr = curses.initscr()
-    # curses.start_color()
-    # curses.cbreak()
     curses.curs_set(0)
     curses.use_default_colors()
-    # curses.noecho()
     stdscr.nodelay(True)
     stdscr.timeout(1000 // args.speed)
-    # stdscr.keypad(True)
 
     colors = {
         "black": curses.COLOR_BLACK,
