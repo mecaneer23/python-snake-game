@@ -3,10 +3,11 @@
 
 import curses
 from argparse import SUPPRESS, ArgumentParser, Namespace
+from collections import deque
 from enum import Enum
 from os.path import exists, expanduser
-from typing import Iterator
 from random import randint
+from typing import Iterator
 
 from working_initscr import wrapper
 
@@ -97,8 +98,7 @@ class Snake(DisplayableInterface):
         self._head_char = head_char
         self._max_speed = max_speed
         self._head = Location(5, 5)
-        # TODO: self._body should use deque rather than list
-        self._body = [Location(5, 4)]
+        self._body: deque[Location] = deque((Location(5, 4),))
         for _ in range(cheat + 1):
             self._body.append(Location(5, 3))
 
@@ -118,7 +118,7 @@ class Snake(DisplayableInterface):
 
     def add_head(self, head: Location) -> None:
         """Display a new head of the snake"""
-        self._body.insert(0, self._head)
+        self._body.appendleft(self._head)
         self._head = head
 
     def __contains__(self, item: Location) -> bool:
