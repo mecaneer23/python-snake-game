@@ -234,12 +234,16 @@ class Game:
         keys: dict[int, Direction] = {
             119: Direction.UP,
             259: Direction.UP,
+            107: Direction.UP,
             97: Direction.LEFT,
             260: Direction.LEFT,
+            104: Direction.LEFT,
             115: Direction.DOWN,
             258: Direction.DOWN,
+            106: Direction.DOWN,
             100: Direction.RIGHT,
             261: Direction.RIGHT,
+            108: Direction.RIGHT,
         }
         try:
             key = self._stdscr.getch()
