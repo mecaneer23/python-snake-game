@@ -98,9 +98,9 @@ class Snake(DisplayableInterface):
         self._head_char = head_char
         self._max_speed = max_speed
         self._head = Location(5, 5)
-        self._body: deque[Location] = deque((Location(5, 4),))
+        self._body: deque[Location] = deque((Location(4, 5),))
         for _ in range(cheat + 1):
-            self._body.append(Location(5, 3))
+            self._body.append(Location(3, 5))
 
     def display(self, stdscr: curses.window) -> None:
         stdscr.addch(
