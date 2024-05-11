@@ -15,7 +15,7 @@ CHARACTER_ASPECT_RATIO = 19 / 9
 FILENAME = expanduser("~/.config/snake-best-score.txt")
 
 
-class DisplayableInterface:
+class DisplayableInterface:  # pylint: disable=too-few-public-methods
     """Specify a class with a display function"""
 
     def display(self, stdscr: curses.window) -> None:
@@ -87,7 +87,7 @@ class Location:
 class Snake(DisplayableInterface):
     """Represent a snake for the game"""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         body_char: str,
         head_char: str,
@@ -194,7 +194,7 @@ class Food(DisplayableInterface):
         )
 
 
-class Game:
+class Game:  # pylint: disable=too-many-instance-attributes
     """Runnable game object"""
 
     _LONG_TEXT = "Controls: wasd or arrow keys, q to quit | Score: 0"
@@ -216,7 +216,7 @@ class Game:
             self._bg_color,
         )
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         stdscr: curses.window,
         snake: Snake,
