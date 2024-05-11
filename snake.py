@@ -7,7 +7,7 @@ from collections import deque
 from enum import Enum
 from os.path import expanduser
 from random import randint
-from typing import Iterator
+from typing import Iterable, Iterator
 
 from working_initscr import wrapper
 
@@ -93,6 +93,7 @@ class Snake(DisplayableInterface):
         head_char: str,
         max_speed: int,
         cheat: int,
+        color: int,
     ) -> None:
         self._body_char = body_char
         self._head_char = head_char
@@ -101,16 +102,22 @@ class Snake(DisplayableInterface):
         self._body: deque[Location] = deque((Location(4, 5),))
         for _ in range(cheat + 1):
             self._body.append(Location(3, 5))
+        self._color = color
 
     def display(self, stdscr: curses.window) -> None:
         stdscr.addch(
             self._head.get_y(),
             self._head.get_x(),
             self._head_char,
-            curses.color_pair(2),
+            self._color,
         )
         for x, y in self:
-            stdscr.addch(y, x, self._body_char, curses.color_pair(2))
+            stdscr.addch(
+                y,
+                x,
+                self._body_char,
+                self._color,
+            )
 
     def get_head(self) -> Location:
         """Returns the head of the snake"""
@@ -149,11 +156,18 @@ class Direction(Enum):
 class Food(DisplayableInterface):
     """Represent the food the snake is currently trying to eat"""
 
-    def __init__(self, char: str, rows: int, cols: int) -> None:
+    def __init__(
+        self,
+        char: str,
+        rows: int,
+        cols: int,
+        color: int,
+    ) -> None:
         self._char = char
         self._rows = rows
         self._cols = cols
         self._location = Location(rows // 2, cols // 2)
+        self._color = color
 
     def get_location(self) -> Location:
         """Return the food's current location"""
@@ -176,7 +190,7 @@ class Food(DisplayableInterface):
             self._location.get_y(),
             self._location.get_x(),
             self._char,
-            curses.color_pair(3),
+            self._color,
         )
 
 
@@ -190,7 +204,7 @@ class Game:
         for y in range(self._board.get_rows()):
             for x in range(self._board.get_cols()):
                 self._stdscr.addch(
-                    y, x, self._board.get_background_char(), curses.color_pair(1)
+                    y, x, self._board.get_background_char(), self._bg_color
                 )
 
         self._stdscr.addstr(
@@ -199,7 +213,7 @@ class Game:
             self._LONG_TEXT
             if self._board.is_large_enough(len(self._LONG_TEXT))
             else self._SHORT_TEXT,
-            curses.color_pair(1),
+            self._bg_color,
         )
 
     def __init__(
@@ -208,6 +222,8 @@ class Game:
         snake: Snake,
         board: Board,
         food_char: str,
+        bg_color: int,
+        food_color: int,
     ) -> None:
         self._stdscr = stdscr
         self._snake = snake
@@ -216,11 +232,13 @@ class Game:
             food_char,
             self._board.get_rows(),
             self._board.get_cols(),
+            food_color,
         )
         self._paused = False
         self._direction = Direction.RIGHT
         self._running = True
         self._score = len(snake)
+        self._bg_color = bg_color
         # best_score = update_best_score(score)
         self._init_board()
         for obj in (self._food, self._snake):
@@ -286,7 +304,7 @@ class Game:
             )
             - 1,
             str(self._score),
-            curses.color_pair(1),
+            self._bg_color,
         )
 
     def run(self) -> str:
@@ -313,7 +331,7 @@ class Game:
                     new_bg.get_y(),
                     new_bg.get_x(),
                     self._board.get_background_char(),
-                    curses.color_pair(1),
+                    self._bg_color,
                 )
             self._snake.add_head(new_head)
             for obj in (self._food, self._snake):
@@ -326,18 +344,8 @@ class Game:
         return self._score
 
 
-def get_args() -> Namespace:
+def get_args(color_choices: Iterable[str]) -> Namespace:
     """Parse the command line arguments using argparse"""
-    color_choices = [
-        "black",
-        "white",
-        "red",
-        "green",
-        "yellow",
-        "blue",
-        "magenta",
-        "cyan",
-    ]
     parser = ArgumentParser(
         description="snake game",
         add_help=False,
@@ -461,12 +469,6 @@ def get_args() -> Namespace:
 
 def main(stdscr: curses.window) -> str:
     """Entry point for snake game"""
-    args = get_args()
-    curses.curs_set(0)
-    curses.use_default_colors()
-    stdscr.nodelay(True)
-    stdscr.timeout(1000 // args.speed)
-
     colors = {
         "black": curses.COLOR_BLACK,
         "white": curses.COLOR_WHITE,
@@ -477,6 +479,12 @@ def main(stdscr: curses.window) -> str:
         "magenta": curses.COLOR_MAGENTA,
         "cyan": curses.COLOR_CYAN,
     }
+
+    args = get_args(colors.keys())
+    curses.curs_set(0)
+    curses.use_default_colors()
+    stdscr.nodelay(True)
+    stdscr.timeout(1000 // args.speed)
 
     curses.init_pair(1, -1 if args.black_white else colors[args.color_bg], -1)
     curses.init_pair(2, -1 if args.black_white else colors[args.color_snake], -1)
@@ -489,6 +497,7 @@ def main(stdscr: curses.window) -> str:
             args.char_head,
             args.speed,
             args.cheat,
+            curses.color_pair(2),
         ),
         Board(
             args.rows or stdscr.getmaxyx()[0] - 1,
@@ -496,6 +505,8 @@ def main(stdscr: curses.window) -> str:
             args.char_bg,
         ),
         args.char_food,
+        curses.color_pair(1),
+        curses.color_pair(3),
     )
 
     return f"Game over: {game.run()}\nScore: {game.get_score()}"
