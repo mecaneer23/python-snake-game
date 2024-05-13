@@ -8,7 +8,7 @@ This is a snake game in python. The default characters are as below.
 
 ## How to play
 
-WASD or arrow keys for snake movement. Q to quit. Any other key to pause. Press one of the movement keys to resume.
+wasd or arrow keys or Vim hjkl for snake movement. q to quit. Any other key to pause. Press one of the movement keys to resume.
 
 ## Running the game
 
