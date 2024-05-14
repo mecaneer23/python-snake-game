@@ -166,7 +166,7 @@ class Food(DisplayableInterface):
         self._char = char
         self._rows = rows
         self._cols = cols
-        self._location = Location(rows // 2, cols // 2)
+        self._location = Location(cols // 2, rows // 2)
         self._color = color
 
     def get_location(self) -> Location:
@@ -177,8 +177,8 @@ class Food(DisplayableInterface):
         """Randomly update the location of the food"""
         while True:
             loc = Location(
-                randint(0, self._rows - 1),
                 randint(0, self._cols - 1),
+                randint(0, self._rows - 1),
             )
             if loc in snake:
                 continue
