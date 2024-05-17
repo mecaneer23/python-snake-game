@@ -308,7 +308,7 @@ class Game:  # pylint: disable=too-many-instance-attributes
         )
 
     def run(self) -> str:
-        """Main loop for game"""
+        """Main loop for game. Returns why game ended."""
         while True:
             if not self._running:
                 return "Quit"
