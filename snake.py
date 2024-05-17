@@ -5,23 +5,15 @@ import curses
 from argparse import SUPPRESS, ArgumentParser, Namespace
 from collections import deque
 from enum import Enum
-# from os.path import exists, expanduser
 from random import randint
 from typing import Iterable, Iterator
 
 from working_initscr import wrapper
 
+# from os.path import exists, expanduser
+
 # CHARACTER_ASPECT_RATIO = 19 / 9
 # FILENAME = expanduser("~/.config/snake-best-score.txt")
-
-
-class DisplayableInterface:  # pylint: disable=too-few-public-methods
-    """Specify a class with a display function"""
-
-    def display(self, stdscr: curses.window) -> None:
-        """Output some sort of representation of this object to stdscr"""
-        _ = stdscr
-        raise NotImplementedError("display must be implemented by child")
 
 
 class Board:
@@ -96,40 +88,42 @@ class Location:
             isinstance(other, Location) and self._x == other._x and self._y == other._y
         )
 
-    def __iter__(self) -> Iterator[int]:
-        return iter({self._x, self._y})
-
     def __repr__(self) -> str:
         return f"({self._x}, {self._y})"
 
 
-class Snake(DisplayableInterface):
+class Snake:
     """Represent a snake for the game"""
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
         body_char: str,
         head_char: str,
-        max_speed: int,
+        # max_speed: int,
         cheat: int,
         color: int,
     ) -> None:
         self._body_char = body_char
         self._head_char = head_char
-        self._max_speed = max_speed
+        # self._max_speed = max_speed
         self._head = Location(5, 5)
         self._body: deque[Location] = deque((Location(4, 5),))
         for _ in range(cheat + 1):
             self._body.append(Location(3, 5))
         self._color = color
 
-    def display(self, stdscr: curses.window) -> None:
+    def display_head(self, stdscr: curses.window) -> None:
+        """Render the head of the snake"""
         stdscr.addch(
             self._head.get_y(),
             self._head.get_x(),
             self._head_char,
             self._color,
         )
+
+    def display(self, stdscr: curses.window) -> None:
+        """Render the snake"""
+        self.display_head(stdscr)
         for x, y in self:
             stdscr.addch(
                 y,
@@ -172,7 +166,7 @@ class Direction(Enum):
     NONE = "none"
 
 
-class Food(DisplayableInterface):
+class Food:
     """Represent the food the snake is currently trying to eat"""
 
     def __init__(
@@ -205,6 +199,7 @@ class Food(DisplayableInterface):
             break
 
     def display(self, stdscr: curses.window) -> None:
+        """Render the food"""
         stdscr.addch(
             self._location.get_y(),
             self._location.get_x(),
@@ -249,8 +244,8 @@ class Game:  # pylint: disable=too-many-instance-attributes
             self._LONG_TEXT,
             self._SHORT_TEXT,
         )
-        for obj in (self._food, self._snake):
-            obj.display(self._stdscr)
+        self._food.display(self._stdscr)
+        self._snake.display(self._stdscr)
 
     def get_input(self) -> Direction:
         """
@@ -342,8 +337,8 @@ class Game:  # pylint: disable=too-many-instance-attributes
                     self._bg_color,
                 )
             self._snake.add_head(new_head)
-            for obj in (self._food, self._snake):
-                obj.display(self._stdscr)
+            self._snake.display_head(self._stdscr)
+            self._food.display(self._stdscr)
             self.display_score()
             self._stdscr.refresh()
 
@@ -503,7 +498,7 @@ def main(stdscr: curses.window) -> str:
         Snake(
             args.char_snake,
             args.char_head,
-            args.speed,
+            # args.speed,
             args.cheat,
             curses.color_pair(2),
         ),
