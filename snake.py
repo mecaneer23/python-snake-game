@@ -37,6 +37,25 @@ class Board:
         self._cols = cols
         self._background_char = background_char
 
+    def init(
+        self,
+        stdscr: curses.window,
+        bg_color: int,
+        long_text: str,
+        short_text: str,
+    ) -> None:
+        """Initialize the board by outputting the background and bottom text."""
+        for y in range(self._rows):
+            for x in range(self._cols):
+                stdscr.addch(y, x, self._background_char, bg_color)
+
+        stdscr.addstr(
+            self._rows,
+            0,
+            long_text if self.is_large_enough(len(long_text)) else short_text,
+            bg_color,
+        )
+
     def get_rows(self) -> int:
         """Get the number of rows"""
         return self._rows
@@ -200,22 +219,6 @@ class Game:  # pylint: disable=too-many-instance-attributes
     _LONG_TEXT = "Controls: wasd or arrow keys, q to quit | Score: 0"
     _SHORT_TEXT = "Score: 0"
 
-    def _init_board(self) -> None:
-        for y in range(self._board.get_rows()):
-            for x in range(self._board.get_cols()):
-                self._stdscr.addch(
-                    y, x, self._board.get_background_char(), self._bg_color
-                )
-
-        self._stdscr.addstr(
-            self._board.get_rows(),
-            0,
-            self._LONG_TEXT
-            if self._board.is_large_enough(len(self._LONG_TEXT))
-            else self._SHORT_TEXT,
-            self._bg_color,
-        )
-
     def __init__(  # pylint: disable=too-many-arguments
         self,
         stdscr: curses.window,
@@ -240,7 +243,12 @@ class Game:  # pylint: disable=too-many-instance-attributes
         self._score = len(snake)
         self._bg_color = bg_color
         # best_score = update_best_score(score)
-        self._init_board()
+        self._board.init(
+            self._stdscr,
+            self._bg_color,
+            self._LONG_TEXT,
+            self._SHORT_TEXT,
+        )
         for obj in (self._food, self._snake):
             obj.display(self._stdscr)
 
