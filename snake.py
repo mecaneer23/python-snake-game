@@ -88,6 +88,10 @@ class Location:
             isinstance(other, Location) and self._x == other._x and self._y == other._y
         )
 
+    def __iter__(self) -> Iterator[int]:
+        yield self._x
+        yield self._y
+
     def __repr__(self) -> str:
         return f"({self._x}, {self._y})"
 
@@ -124,7 +128,7 @@ class Snake:
     def display(self, stdscr: curses.window) -> None:
         """Render the snake"""
         self.display_head(stdscr)
-        for x, y in self:
+        for x, y in self._body:
             stdscr.addch(
                 y,
                 x,
@@ -150,10 +154,6 @@ class Snake:
 
     def __len__(self) -> int:
         return len(self._body) + 1
-
-    def __iter__(self) -> Iterator[tuple[int, int]]:
-        for loc in self._body:
-            yield loc.get_x(), loc.get_y()
 
 
 class Direction(Enum):
