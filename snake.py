@@ -5,14 +5,14 @@ import curses
 from argparse import SUPPRESS, ArgumentParser, Namespace
 from collections import deque
 from enum import Enum
-from os.path import expanduser
+# from os.path import exists, expanduser
 from random import randint
 from typing import Iterable, Iterator
 
 from working_initscr import wrapper
 
-CHARACTER_ASPECT_RATIO = 19 / 9
-FILENAME = expanduser("~/.config/snake-best-score.txt")
+# CHARACTER_ASPECT_RATIO = 19 / 9
+# FILENAME = expanduser("~/.config/snake-best-score.txt")
 
 
 class DisplayableInterface:  # pylint: disable=too-few-public-methods
@@ -467,7 +467,7 @@ def get_args(color_choices: Iterable[str]) -> Namespace:
 
 
 # def fetch_best_score(score: int = 0) -> int:
-#     if not exists(FILENAME):  # from os.path
+#     if not exists(FILENAME):
 #         with open(FILENAME, "w", encoding="utf-8") as f:
 #             f.write(str(score))
 #         return score
