@@ -1,10 +1,14 @@
 # Python Snake Game
 
+![Snake game in action!](res/snake.png)
+
 This is a snake game in python. The default characters are as below.
 
 - Snake: `#`
 - Food: `*`
 - Background: `.`
+
+[GitHub](https://github.com/mecaneer23/python-snake-game)
 
 ## How to play
 
