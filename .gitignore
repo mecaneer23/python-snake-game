@@ -1,3 +1,4 @@
 best-score.txt
 typings/
 __pycache__
+.venv
