@@ -15,6 +15,17 @@ from working_initscr import wrapper
 # CHARACTER_ASPECT_RATIO = 19 / 9
 # FILENAME = expanduser("~/.config/snake-best-score.txt")
 
+COLORS = {
+    "black": curses.COLOR_BLACK,
+    "white": curses.COLOR_WHITE,
+    "red": curses.COLOR_RED,
+    "green": curses.COLOR_GREEN,
+    "yellow": curses.COLOR_YELLOW,
+    "blue": curses.COLOR_BLUE,
+    "magenta": curses.COLOR_MAGENTA,
+    "cyan": curses.COLOR_CYAN,
+}
+
 
 class Board:
     """Represent a board for the snake to move on"""
@@ -470,28 +481,17 @@ def get_args(color_choices: Iterable[str]) -> Namespace:
 #         return int(f.read().split("\n")[0])
 
 
-def main(stdscr: curses.window) -> str:
+def main(stdscr: curses.window, args: Namespace) -> str:
     """Entry point for snake game"""
-    colors = {
-        "black": curses.COLOR_BLACK,
-        "white": curses.COLOR_WHITE,
-        "red": curses.COLOR_RED,
-        "green": curses.COLOR_GREEN,
-        "yellow": curses.COLOR_YELLOW,
-        "blue": curses.COLOR_BLUE,
-        "magenta": curses.COLOR_MAGENTA,
-        "cyan": curses.COLOR_CYAN,
-    }
 
-    args = get_args(colors.keys())
     curses.curs_set(0)
     curses.use_default_colors()
     stdscr.nodelay(True)
     stdscr.timeout(1000 // args.speed)
 
-    curses.init_pair(1, -1 if args.black_white else colors[args.color_bg], -1)
-    curses.init_pair(2, -1 if args.black_white else colors[args.color_snake], -1)
-    curses.init_pair(3, -1 if args.black_white else colors[args.color_food], -1)
+    curses.init_pair(1, -1 if args.black_white else COLORS[args.color_bg], -1)
+    curses.init_pair(2, -1 if args.black_white else COLORS[args.color_snake], -1)
+    curses.init_pair(3, -1 if args.black_white else COLORS[args.color_food], -1)
 
     game = Game(
         stdscr,
@@ -516,4 +516,4 @@ def main(stdscr: curses.window) -> str:
 
 
 if __name__ == "__main__":
-    print(wrapper(main))
+    print(wrapper(main, get_args(COLORS.keys())))
