@@ -287,10 +287,7 @@ class Game:  # pylint: disable=too-many-instance-attributes
             return Direction.NONE
         if key == -1:  # no key provided
             return self._direction
-        try:
-            return keys[key]
-        except KeyError:
-            return Direction.NONE
+        return keys.get(key, Direction.NONE)
 
     def get_new_head(self) -> Location:
         """Return the location of the snake's new head"""
