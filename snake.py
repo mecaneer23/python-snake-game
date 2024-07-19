@@ -258,6 +258,23 @@ class Game:  # pylint: disable=too-many-instance-attributes
         self._food.display(self._stdscr)
         self._snake.display(self._stdscr)
 
+    @staticmethod
+    def _ensure_valid(old: Direction, new: Direction) -> Direction:
+        """Disallow moving in the opposite direction from current"""
+        if new == Direction.NONE:
+            return Direction.NONE
+
+        opposites: dict[Direction, Direction] = {
+            Direction.UP: Direction.DOWN,
+            Direction.DOWN: Direction.UP,
+            Direction.LEFT: Direction.RIGHT,
+            Direction.RIGHT: Direction.LEFT,
+        }
+
+        if new == opposites[old]:
+            return old
+        return new
+
     def get_input(self) -> Direction:
         """
         If a key has been pressed, change the
@@ -287,7 +304,7 @@ class Game:  # pylint: disable=too-many-instance-attributes
             return Direction.NONE
         if key == -1:  # no key provided
             return self._direction
-        return keys.get(key, Direction.NONE)
+        return self._ensure_valid(self._direction, keys.get(key, Direction.NONE))
 
     def get_new_head(self) -> Location:
         """Return the location of the snake's new head"""
