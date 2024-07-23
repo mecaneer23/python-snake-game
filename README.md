@@ -34,5 +34,4 @@ python3 snake.py --color-snake blue --color-food red
 ## Todo
 
 - [ ] Make horizontal and vertical speeds equal (see commit history for details)
-- [ ] Fix pausing (save state and unpause at same state)
 - [ ] Add support for best score saving/loading (tentative)

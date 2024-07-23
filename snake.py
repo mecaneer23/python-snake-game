@@ -168,13 +168,17 @@ class Snake:
 
 
 class Direction(Enum):
-    """Represent the direction the snake is currently facing/moving"""
+    """
+    Represent the state the snake is currently in.
+    Includes paused, direction snake is heading/facing/moving, and gameover
+    """
 
     UP = "up"
     DOWN = "down"
     LEFT = "left"
     RIGHT = "right"
-    NONE = "none"
+    PAUSED = "paused"
+    GAMEOVER = "gameover"
 
 
 class Food:
@@ -243,9 +247,8 @@ class Game:  # pylint: disable=too-many-instance-attributes
             self._board.get_cols(),
             food_color,
         )
-        self._paused = False
+        self._paused = Direction.PAUSED
         self._direction = Direction.RIGHT
-        self._running = True
         self._score = len(snake)
         self._bg_color = bg_color
         # best_score = update_best_score(score)
@@ -258,11 +261,16 @@ class Game:  # pylint: disable=too-many-instance-attributes
         self._food.display(self._stdscr)
         self._snake.display(self._stdscr)
 
-    @staticmethod
-    def _ensure_valid(old: Direction, new: Direction) -> Direction:
+    def _ensure_valid(self, new: Direction) -> Direction:
         """Disallow moving in the opposite direction from current"""
-        if new == Direction.NONE:
-            return Direction.NONE
+        if self._direction == Direction.PAUSED:
+            unpause_heading = self._paused
+            self._paused = Direction.PAUSED
+            return unpause_heading
+
+        if new == Direction.PAUSED:
+            self._paused = self._direction
+            return Direction.PAUSED
 
         opposites: dict[Direction, Direction] = {
             Direction.UP: Direction.DOWN,
@@ -271,11 +279,11 @@ class Game:  # pylint: disable=too-many-instance-attributes
             Direction.RIGHT: Direction.LEFT,
         }
 
-        if new == opposites[old]:
-            return old
+        if new == opposites[self._direction]:
+            return self._direction
         return new
 
-    def get_input(self) -> Direction:
+    def _get_new_direction(self) -> Direction:
         """
         If a key has been pressed, change the
         direction or pause the game
@@ -297,21 +305,17 @@ class Game:  # pylint: disable=too-many-instance-attributes
         try:
             key = self._stdscr.getch()
         except KeyboardInterrupt:  # exit on ^C
-            self._running = False
-            return Direction.NONE
+            return Direction.GAMEOVER
         if key in (113, 27):  # q, esc
-            self._running = False
-            return Direction.NONE
+            return Direction.GAMEOVER
         if key == -1:  # no key provided
             return self._direction
-        return self._ensure_valid(self._direction, keys.get(key, Direction.NONE))
+        return self._ensure_valid(keys.get(key, Direction.PAUSED))
 
-    def get_new_head(self) -> Location:
+    def _get_new_head(self) -> Location:
         """Return the location of the snake's new head"""
-        self._direction = self.get_input()
-        self._paused = False
-        if self._direction == Direction.NONE:
-            self._paused = True
+        self._direction = self._get_new_direction()
+        if self._direction == Direction.PAUSED:
             return Location(-1, -1)  # pause
         addend = 1 if self._direction in (Direction.DOWN, Direction.RIGHT) else -1
         head = self._snake.get_head()
@@ -321,7 +325,7 @@ class Game:  # pylint: disable=too-many-instance-attributes
             return Location(new_x + addend, new_y)
         return Location(new_x, new_y + addend)
 
-    def display_score(self) -> None:
+    def _display_score(self) -> None:
         """Output the current score at the correct location"""
         self._stdscr.addstr(
             self._board.get_rows(),
@@ -338,10 +342,10 @@ class Game:  # pylint: disable=too-many-instance-attributes
     def run(self) -> str:
         """Main loop for game. Returns why game ended."""
         while True:
-            if not self._running:
+            new_head = self._get_new_head()
+            if self._direction == Direction.GAMEOVER:
                 return "Quit"
-            new_head = self.get_new_head()
-            if self._paused:
+            if self._direction == Direction.PAUSED:
                 continue
             if new_head.get_y() in (self._board.get_rows(), -1):
                 return "Snake out of bounds vertically"
@@ -364,7 +368,7 @@ class Game:  # pylint: disable=too-many-instance-attributes
             self._snake.add_head(new_head)
             self._snake.display_head(self._stdscr)
             self._food.display(self._stdscr)
-            self.display_score()
+            self._display_score()
             self._stdscr.refresh()
 
     def get_score(self) -> int:
