@@ -2,7 +2,9 @@
 
 ![Snake game in action!](res/snake.png)
 
-This is a snake game written in Python. The default characters are as below.
+The classic snake game written in Python for the terminal using curses.
+
+## Default Characters
 
 - Snake: `#`
 - Food: `*`
